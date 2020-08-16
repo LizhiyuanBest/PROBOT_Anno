@@ -1,0 +1,10 @@
+<launch>
+
+    <!-- 将关节控制器的配置参数加载到参数服务器中 -->
+    <rosparam file="$(find probot_gazebo)/config/probot_anno_with_gripper_trajectory_control.yaml" command="load"/>
+
+    <!-- 加载控制器 -->
+    <node name="arm_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+          output="screen" ns="/probot_anno" args="arm_joint_controller gripper_joint_controller"/>
+
+</launch>
