@@ -125,8 +125,8 @@ class Robot:
         u1 = res.pred[1] - u0
         fai = res.pred[2]
 
-        u1_ = v1*math.sin(rpy[2]) + u1*math.cos(rpy[2])
-        v1_ = v1*math.cos(rpy[2]) - u1*math.sin(rpy[2])
+        u1_ = v1*math.sin(-rpy[2]) + u1*math.cos(-rpy[2])
+        v1_ = v1*math.cos(-rpy[2]) - u1*math.sin(-rpy[2])
 
         ey = -v1_ * dx
         ex = -u1_ * dy

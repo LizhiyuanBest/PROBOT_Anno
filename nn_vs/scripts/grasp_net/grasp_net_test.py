@@ -154,11 +154,14 @@ def detectCallback(req):
     # print(H, W)
     imgs = []
     for i in range(L2, W - L2, step):
+        STEP = 0
         for j in range(L2, H - L2, step):
+            STEP += 1
             img = img_src.crop(box=(j - L2, i - L2, j + L2, i + L2))
             img = transform(img).unsqueeze(0)
             imgs.append(img)
-
+    STEP -= 1
+    print(STEP)
     img2 = torch.cat(imgs, 0)
     img2 = img2.to(device)
     pred = model(img2)
@@ -182,12 +185,12 @@ def detectCallback(req):
         l = 0
         flag = False
         for j in range(L2, H-L2, step):
-            p_pos = pred_img[k*((H-L-1)//step+1) + l]
+            p_pos = pred_img[k*STEP + l]
             p_img.append(p_pos)
-            p_ang.append(pred_ang[k*((H-L-1)//step+1) + l])
+            p_ang.append(pred_ang[k*STEP + l])
             l+=1
             if p_pos > 0.99:
-                cos2, sin2 = pred_ang[k*((H-L-1)//step+1) + l]
+                cos2, sin2 = pred_ang[k*STEP + l]
                 cos  = math.log(cos2/(1-cos2))
                 sin  = 0.5 * math.log((1+sin2)/(1-sin2))
                 fai  = 0.5 * math.atan2(sin, cos)
