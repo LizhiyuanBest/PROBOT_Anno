@@ -1,0 +1,333 @@
+<?xml version="1.0"?>
+<robot name="probot_anno" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="M_PI" value="3.1415926536"/>
+  <xacro:include filename="$(find probot_description)/urdf/materials.urdf.xacro" />
+  <!-- <xacro:include filename="$(find robotiq_2f_c2_gripper_visualization)/urdf/robotiq_c2_model_macro.xacro" />
+  <xacro:robotiq_c2_model prefix=""/> -->
+
+
+  <!-- Inertial matrix -->
+  <xacro:macro name="inertial_matrix" params="mass">
+      <inertial>
+          <mass value="${mass}" />
+          <inertia ixx="0.000526462289415" ixy="0.0" ixz="0.0" iyy="0.000526462289415" iyz="0.0" izz="0.000568125"/>
+      </inertial>
+  </xacro:macro>
+
+  <!-- surface -->
+  <xacro:macro name="surface_param">
+    <surface>
+      <contact>
+        <poissons_ratio>0.347</poissons_ratio>
+        <elastic_modulus>8.8e+09</elastic_modulus>
+        <ode>
+          <kp>100000</kp>
+          <kd>100</kd>
+          <max_vel>100</max_vel>
+          <min_depth>0.001</min_depth>
+        </ode>
+      </contact>
+      <friction>
+        <torsional>
+          <coefficient>1</coefficient>
+          <use_patch_radius>0</use_patch_radius>
+          <surface_radius>0.01</surface_radius>
+          <ode/>
+        </torsional>
+        <ode/>
+      </friction>
+      <bounce/>
+    </surface>
+  </xacro:macro>
+
+
+  <link name="world" static="true"/>
+  <joint name="joint_0" type="fixed">
+    <origin xyz="0.0 0 0.03" rpy="0 0 0" />
+    <parent link="world" />
+    <child link="base_link" />
+  </joint>
+
+  <link name="base_link">
+    <inertial>
+      <origin xyz="-0.010934 0.23134 0.0051509" rpy="0 0 0" />
+      <mass value="4.0"/>
+      <inertia ixx="0.0061063308908" ixy="0.0" ixz="0.0" iyy="0.0061063308908" iyz="0.0" izz="0.01125"/>
+      <!-- <mass value="0.01" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" /> -->
+    </inertial>
+    <visual>
+      <origin xyz="0.017266 0 0.0315" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/base_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.017266 0 0.0315" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="base_link">
+    <static>true</static>
+    <implicitSpringDamper>1</implicitSpringDamper>
+    <material>Gazebo/White</material>
+    <mu1>100000</mu1>
+    <mu2>100000</mu2>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <link name="link_1">
+    <inertial>
+      <origin xyz="-0.010934 0.23134 0.0051509" rpy="0 0 0" />
+      <mass value="7.778"/>
+      <inertia ixx="0.0314743125769" ixy="0.0" ixz="0.0" iyy="0.0314743125769" iyz="0.0" izz="0.021875625"/>
+      <!-- <mass value="0.01" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" /> -->
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_1.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_1" type="revolute">
+    <origin xyz="0 0 0.0315" rpy="1.5708 0 0" />
+    <parent link="base_link" />
+    <child link="link_1" />
+    <axis xyz="0 1 0" />
+    <limit lower="-3.1416" upper="3.1416" effort="100" velocity="3" />
+  </joint>
+
+  <link name="link_2">
+    <inertial>
+      <origin xyz="-0.010934 0.23134 0.0051509" rpy="0 0 0" />
+      <mass value="0.1293"/>
+      <inertia ixx="0.421753803798" ixy="0.0" ixz="0.0" iyy="0.421753803798" iyz="0.0" izz="0.036365625"/>
+      <!-- <mass value="0.001" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" /> -->
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_2.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_2" type="revolute">
+    <origin xyz="0 0.2305 0" rpy="0 0 0" />
+    <parent link="link_1" />
+    <child link="link_2" />
+    <axis xyz="0 0 1" />
+    <limit lower="-2.0071" upper="2.0071" effort="100" velocity="3" />
+  </joint>
+
+  <link name="link_3">
+    <inertial>
+      <origin xyz="-0.010934 0.23134 0.0051509" rpy="0 0 0" />
+      <mass value="0.0387"/>
+      <inertia ixx="0.111069694097" ixy="0.0" ixz="0.0" iyy="0.111069694097" iyz="0.0" izz="0.010884375"/>
+      <!-- <mass value="0.001" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" /> -->
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_3.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_3" type="revolute">
+    <origin xyz="0 0.225 0" rpy="0 0 0" />
+    <parent link="link_2" />
+    <child link="link_3" />
+    <axis xyz="0 0 1" />
+    <limit lower="-0.6981" upper="3.8397" effort="100" velocity="3" />
+  </joint>
+
+  <link name="link_4">
+    <inertial>
+      <origin xyz="-0.010934 0.23134 0.0051509" rpy="0 0 0" />
+      <mass value="0.0196"/>
+      <inertia ixx="0.0051082479567" ixy="0.0" ixz="0.0" iyy="0.0051082479567" iyz="0.0" izz="0.0055125"/>
+      <!-- <mass value="0.00001" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" /> -->
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_4.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_4.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_4" type="revolute">
+    <origin xyz="0.023 0 0.0" rpy="0 0 0" />
+    <parent link="link_3" />
+    <child link="link_4" />
+    <axis xyz="1 0 0" />
+    <limit lower="-3.1416" upper="3.1416" effort="100" velocity="3" />
+  </joint>
+
+  <link name="link_5">
+    <inertial>
+      <origin xyz="-0.010934 0.23134 0.0051509" rpy="0 0 0" />
+      <mass value="0.0196"/>
+      <inertia ixx="0.0051082479567" ixy="0.0" ixz="0.0" iyy="0.0051082479567" iyz="0.0" izz="0.0055125"/>
+      <!-- <mass value="0.00001" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" /> -->
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_5.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_5.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_5" type="revolute">
+    <origin xyz="0.20585535 0 0" rpy="0 0 0" />
+    <parent link="link_4" />
+    <child link="link_5" />
+    <axis xyz="0 0 1" />
+    <limit lower="-0.7854" upper="3.9270" effort="100" velocity="3" />
+  </joint>
+
+  <link name="link_6">
+    <inertial>
+      <origin xyz="-0.010934 0.23134 0.0051509" rpy="0 0 0" />
+      <mass value="0.00202"/>
+      <inertia ixx="0.000526462289415" ixy="0.0" ixz="0.0" iyy="0.000526462289415" iyz="0.0" izz="0.000568125"/>
+      <!-- <mass value="0.00001" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" /> -->
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_6.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://probot_description/meshes/PROBOT_Anno/link_6.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint_6" type="revolute">
+    <origin xyz="0 -0.042 0" rpy="0 0 0" />
+    <parent link="link_5" />
+    <child link="link_6" />
+    <axis xyz="0 -1 0" />
+    <limit lower="-3.1416" upper="3.1416" effort="100" velocity="3" />
+  </joint>
+
+  <link name="tool0"/>
+  <joint name="joint_tool0" type="fixed">
+    <origin xyz="0 -0.013 0" rpy="${M_PI/2} 0 0" />
+    <parent link="link_6" />
+    <child link="tool0" />
+  </joint>
+
+   <!-- Attach the right gripper -->
+   <!-- <gripper parent="tool0" color="Green" xyz="0 0.015 0.02" rpy="0 ${-M_PI/2} ${-M_PI/2}"/> -->
+
+    <!-- Grasping frame -->
+    <link name="grasping_frame"/>
+
+    <joint name="grasping_frame_joint" type="fixed">
+      <parent link="tool0"/>
+      <child link="grasping_frame"/>
+      <origin xyz="0.0 0 0.01" rpy="0 0 0"/>
+    </joint>
+
+
+
+  <!-- Transmissions for ROS Control -->
+  <xacro:macro name="transmission_block" params="joint_name">
+    <transmission name="tran1">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${joint_name}">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="${joint_name}_joint">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+  </xacro:macro>
+  
+  <xacro:transmission_block joint_name="joint_1"/>
+  <xacro:transmission_block joint_name="joint_2"/>
+  <xacro:transmission_block joint_name="joint_3"/>
+  <xacro:transmission_block joint_name="joint_4"/>
+  <xacro:transmission_block joint_name="joint_5"/>
+  <xacro:transmission_block joint_name="joint_6"/>
+
+
+  <xacro:include filename="$(find probot_description)/urdf/sensors/camera.urdf.xacro"/>
+  <xacro:include filename="$(find probot_description)/urdf/sensors/hand_camera.urdf.xacro"/>
+
+  <!-- ros_control plugin -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/probot_anno</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
+  </gazebo>
+
+</robot>
