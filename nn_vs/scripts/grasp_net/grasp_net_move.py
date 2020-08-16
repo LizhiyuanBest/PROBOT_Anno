@@ -200,12 +200,12 @@ if __name__ == "__main__":
     global detect_flag
     try:
         rb.test_move()
-        rospy.sleep(2)
+        rospy.sleep(1)
         while True:
             if detect_flag == True:
-                rospy.sleep(1)
+                rospy.sleep(0.5)
                 rb.test_detect()
-            rospy.sleep(1)
+            rospy.sleep(0.5)
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
