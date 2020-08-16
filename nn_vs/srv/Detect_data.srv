@@ -1,0 +1,6 @@
+Image_Msg img1
+Image_Msg img2
+
+---
+float32[] pred
+
