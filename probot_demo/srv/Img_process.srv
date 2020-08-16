@@ -1,0 +1,6 @@
+string[] signal
+
+---
+string result
+Process_Result[] objects
+
