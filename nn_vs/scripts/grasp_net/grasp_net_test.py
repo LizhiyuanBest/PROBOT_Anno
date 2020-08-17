@@ -46,6 +46,8 @@ Test_Path = '/home/li/visual_servo/GraspNet/data/test.txt'
 simple_img = '/home/li/visual_servo/GraspNet/data/simple/image_206.jpg'
 Weight_Path = '/home/li/visual_servo/GraspNet/weights'
 Detect_PATH = '/home/li/ROS/probot_ws/src/PROBOT_Anno/nn_vs/detect'
+Blank_file = '/home/li/ROS/probot_ws/src/PROBOT_Anno/nn_vs/blank.jpg'
+
 
 model = Net().to(device)
 best = 'best.pt'
@@ -54,10 +56,11 @@ model.load_state_dict(chkpt['model'])
 del chkpt
 
 model.eval()
-
+blank = cv2.imread(Blank_file)
 transform = T.ToTensor()
 L = 128
 L2 = L // 2
+padding = 50
 
 def max_contour(contours):
     """ return the max contour """
@@ -119,14 +122,21 @@ def img_pretreated(src):
     # roi_r = rightmost[0]+(lr//2+lr%2) if rightmost[0]+(lr//2+lr%2) < 480 else 480
     # roi_t = topmost[1]-tb//2 if topmost[1]-tb//2 > 0 else 0
     # roi_b = bottommost[1]+(tb//2+tb%2) if bottommost[1]+(tb//2+tb%2) < 640 else 640 
-    roi_t = leftmost[0]-50 if leftmost[0]-50 > 0 else 0
-    roi_b = rightmost[0]+50 if rightmost[0]+50 < 480 else 480
-    roi_l = topmost[1]-50 if topmost[1]-50 > 0 else 0
-    roi_r = bottommost[1]+50 if bottommost[1]+50 < 640 else 640 
+    roi_t = leftmost[0]-50 # if leftmost[0]-50 > 0 else 0
+    roi_b = rightmost[0]+50 # if rightmost[0]+50 < 480 else 480
+    roi_l = topmost[1]-50 # if topmost[1]-50 > 0 else 0
+    roi_r = bottommost[1]+50 # if bottommost[1]+50 < 640 else 640 
     # print(roi_l, roi_r, roi_t, roi_b)
     # ROI (128,128,3)
     return [roi_l,roi_r,roi_t,roi_b]
 
+def img_extend(src_img, blank, L=50):
+    width = int(blank.shape[1] + L*2)
+    height = int(blank.shape[0] + L*2)
+    dim = (width, height)
+    ex_blank = cv2.resize(blank, dim)
+    ex_blank[L:height-L, L:width-L] = src_img
+    return ex_blank
 
 
 def detectCallback(req):
@@ -136,6 +146,8 @@ def detectCallback(req):
     # img1[:,:,0], img1[:,:,1], img1[:,:,2] = image1[:,:,2],image1[:,:,1],image1[:,:,0]
     # cv2.imshow("Image 1", img1)
     # cv2.waitKey(0)
+    img1 = img_extend(img1, blank, L=padding)
+    print(img1.shape)
     roi = img_pretreated(img1)
     print(roi)
     img1 = img1[roi[0]:roi[1], roi[2]:roi[3]]
@@ -216,8 +228,8 @@ def detectCallback(req):
     x = np.mean(res_pos_x)
     y = np.mean(res_pos_y)
     ang = np.mean(res_ang)
-    x = x + roi[2]
-    y = y + roi[0]
+    x = x + roi[2] - padding
+    y = y + roi[0] - padding
     print(x,y,ang)
 
     # cv2.imshow("img_pos", img_np)

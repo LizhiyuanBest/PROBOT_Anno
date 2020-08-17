@@ -27,8 +27,8 @@ sys.path.append('/opt/ros/kinetic/lib/python2.7/dist-packages')
 pi = 3.14159
 
 # dx = dy = float(400) / 290  # mm/像素  1.37931
-dx = float(150)/(497-113)
-dy = float(150)/(418-306)
+dx = float(300)/(560-176)
+dy = float(300)/(418-35)
 
 u0 = 240  
 v0 = 320  
