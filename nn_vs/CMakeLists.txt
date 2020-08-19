@@ -63,6 +63,7 @@ add_service_files(
   Save_image.srv
   Image_data.srv
   Detect_data.srv
+  yolo_grasp.srv
 )
 
 ## Generate actions in the 'action' folder
