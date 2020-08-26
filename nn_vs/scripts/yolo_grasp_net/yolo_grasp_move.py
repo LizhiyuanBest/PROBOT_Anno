@@ -48,6 +48,7 @@ class Robot:
         # self.arm.set_named_target('home')
         # self.arm.go()
         # rospy.sleep(1)
+        self.test_move()
 
         rospy.wait_for_service('/detect/server')
         self.detect_client = rospy.ServiceProxy('/detect/server', yolo_grasp)
@@ -83,6 +84,8 @@ class Robot:
         if math.fabs(ex) < 10.0 and math.fabs(ey) < 10.0 :
             x3 = current_pose.pose.position.x
             y3 = current_pose.pose.position.y
+            if ang + fai > 180: fai -= 180
+            if ang + fai < -180: fai += 180
             ang += fai
             # Yaw += fai*pi/180
         else:
@@ -102,6 +105,18 @@ class Robot:
         rpy = self.arm.get_current_rpy()
         # print(rpy)
 
+        # for i in range(10000):
+        #     rpy = self.arm.get_current_rpy()
+        #     print(rpy)
+        #     ang = rpy[2]/pi*180
+        #     fai = 10 
+        #     if ang + fai > 180: fai -= 180
+        #     if ang + fai < -180: fai += 180
+        #     self.arm.set_pose_target([X0+0.01, Y0+0.05, Z, -180*pi/180, 0*pi/180, (ang + fai)*pi/180])
+        #     self.arm.go()
+        #     rospy.sleep(0.5)
+
+
         self.arm.set_pose_target([X0+0.01, Y0+0.05, Z, -180*pi/180, 0*pi/180, 0*pi/180])
         self.arm.go()
         rospy.sleep(0.5)
@@ -120,7 +135,7 @@ if __name__ == "__main__":
 
     rb = Robot()
     try:
-        rb.test_move()
+        # rb.test_move()
         rospy.sleep(1)
         while True:
             rospy.sleep(0.1)
