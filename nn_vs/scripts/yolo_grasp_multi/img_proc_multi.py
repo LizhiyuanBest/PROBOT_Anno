@@ -21,12 +21,11 @@ if ros_path in sys.path:
     sys.path.remove(ros_path)
 import cv2
 sys.path.append('/opt/ros/kinetic/lib/python2.7/dist-packages')
-sys.path.append('/home/li/visual_servo/yolov3_pytorch')
+sys.path.append('/home/li/visual_servo/yolov3_grasp')
 from models import *
 from project.utils import *
 from project.datasets import *
 import project.torch_utils as torch_utils
-from grasp_model import * 
 from torchvision import transforms as T
 
 pi = 3.14159
@@ -39,7 +38,7 @@ u0 = 240
 v0 = 320  
 
 Images_PATH = '/home/li/ROS/probot_ws/src/PROBOT_Anno/nn_vs/images/image_200.jpg'
-yolo_path = '/home/li/visual_servo/yolov3_pytorch'
+yolo_path = '/home/li/visual_servo/yolov3_grasp_multi'
 cfg = join(yolo_path, 'cfg/yolov3-tiny.cfg')
 data_cfg = join(yolo_path, 'data/objs.data')
 weights = join(yolo_path, 'weights/best.pt')
@@ -60,17 +59,10 @@ model.fuse()
 # Eval mode
 model.to(device).eval()
 
-# Get classes and colors
-classes = ['bolt']
+ # Get classes and colors
+classes = ['bolt', 'pipe']
 colors = [[random.randint(0, 255) for _ in range(3)] for _ in range(len(classes))]
 
-graspnet = GraspNet().to(device)
-graspnet.eval()
-
-grasp_weights = join(yolo_path, 'weights/graspnet_best3000.pt')
-chkpt = torch.load(grasp_weights, map_location=device)
-graspnet.load_state_dict(chkpt['model'])
-del chkpt
 
 global detect_flag
 detect_flag = False
@@ -100,12 +92,12 @@ class Image_Processor:
         start = time.time()
         global detect_flag
         img_src = np.ndarray(shape=(data.height, data.width, 3), dtype=np.uint8, buffer=data.data)
-        self.img_c = cv2.cvtColor(img_src,cv2.COLOR_BGR2RGB)
+        self.img_c = cv2.cvtColor(img_src,cv2.COLOR_RGB2BGR)
         img0 = self.img_c.copy()
         # Padded resize  将图像填充w=h，并resize
         img, _, _, _ = letterbox(img0, new_shape=img_size)
         # Normalize RGB
-        img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB
+        img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3*416*416
         img = np.ascontiguousarray(img, dtype=np.float32)  # uint8 to float32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
         # Get detections
@@ -113,42 +105,33 @@ class Image_Processor:
         pred, _ = model(img)
         # print(pred)
         det = non_max_suppression(pred, conf_thres, nms_thres)[0]
-        
-        # Rescale boxes from 416 to true image size
-        det[:, :4] = scale_coords(img.shape[2:], det[:, :4], img0.shape).round()
-        *xyxy, conf, cls_conf, cls = det[0]
-        c1, c2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))
-        print(c1,c2)
-        center = [(c1[0]+c2[0])//2, (c1[1]+c2[1])//2]
-        bb = [center[0]-L2, center[1]-L2, center[0]+L2, center[1]+L2]
-
-        img1 = cv2.cvtColor(img0[bb[1]:bb[3], bb[0]:bb[2]],cv2.COLOR_BGR2RGB)
-        img1 = Image.fromarray(img1)
-        img1 = transform(img1).unsqueeze(0)
-        img1 = img1.to(device)
-        pred = graspnet(img1)
-        pred = pred.squeeze().cpu().detach().numpy()
-        res = [float(x) for x in pred]
-        # print(res)
+        # print(len(det))
         self.ang = 0.0
         self.x = v0
         self.y = u0
-        if res[0] > 0.99:
-            cos2, sin2 = res[1], res[2]
-            cos  = math.log(cos2/(1-cos2))
-            sin  = 0.5 * math.log((1+sin2)/(1-sin2))
-            fai  = 0.5 * math.atan2(sin, cos)
-            ang = fai * 180 / math.pi
-            print(ang)
-            self.ang = ang
+        if det is not None and len(det) > 0:
+            # Rescale boxes from 416 to true image size
+            det[:, :4] = scale_coords(img.shape[2:], det[:, :4], img0.shape).round()
+            # det[:, 4] = math.log(det[:, 4]/(1-det[:, 4]))
+            # det[:, 5] = 0.5 * math.log((1 + det[:, 5]) / (1 - det[:, 5]))
+            det[:, 4] = 0.5 * torch.atan2(det[:, 5], det[:, 4])
+            det[:, 5] = det[:, 4] * 180 / math.pi
+            *xyxy, ang, deg, conf, cls_conf, cls = det[0]
+            c1, c2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))
+            print(c1,c2)
+            center = [(c1[0]+c2[0])//2, (c1[1]+c2[1])//2]
+            # bb = [center[0]-L2, center[1]-L2, center[0]+L2, center[1]+L2]
+            self.ang = deg
             self.x = center[0]
             self.y = center[1]
+            # print(center[0], center[1], deg)
+            # Draw bounding boxes and labels of detections
+            for *xyxy, ang, deg, conf, cls_conf, cls in det:
+                # Add bbox to the image
+                label = '%s %.2f %.1f' % (classes[int(cls)], conf, deg)
+                plot_one_box(xyxy, img0, label=label, color=colors[int(cls)])
 
-
-        # Add bbox to the image
-        label = '%s %.2f' % (classes[int(cls)], conf)
-        plot_one_box(xyxy, img0, label=label, color=colors[int(cls)])
-        # cv2.imshow("Current image", self.img_c)
+        # cv2.imshow("Current image", img_src)
         cv2.imshow("image0", img0)
         cv2.imshow("Target image", self.img_t)
         cv2.waitKey(3)

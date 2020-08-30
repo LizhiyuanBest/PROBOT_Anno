@@ -28,7 +28,7 @@ class image_listenner:
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/probot_anno/hand_camera/hand_image_raw",Image,self.image_sub_callback)
         self.image_srv = rospy.Service('/image_save', Save_image, self.image_srv_callback)
-        self.image_id = 206
+        self.image_id = 210
         self.img = np.zeros((640, 480, 3), dtype=np.uint8)  # 初始图像
 
     def image_sub_callback(self, data):

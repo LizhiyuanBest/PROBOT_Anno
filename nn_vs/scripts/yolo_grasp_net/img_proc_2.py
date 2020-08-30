@@ -60,7 +60,7 @@ model.fuse()
 model.to(device).eval()
 
 # Get classes and colors
-classes = ['blot']
+classes = ['bolt']
 colors = [[random.randint(0, 255) for _ in range(3)] for _ in range(len(classes))]
 
 
@@ -113,7 +113,7 @@ class Image_Processor:
             det[:, :4] = scale_coords(img.shape[2:], det[:, :4], img0.shape).round()
             # det[:, 4] = math.log(det[:, 4]/(1-det[:, 4]))
             # det[:, 5] = 0.5 * math.log((1 + det[:, 5]) / (1 - det[:, 5]))
-            det[:, 4] = 0.5 * math.atan2(det[:, 5], det[:, 4])
+            det[:, 4] = 0.5 * torch.atan2(det[:, 5], det[:, 4])
             det[:, 5] = det[:, 4] * 180 / math.pi
             *xyxy, ang, deg, conf, cls_conf, cls = det[0]
             c1, c2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))
@@ -128,30 +128,6 @@ class Image_Processor:
             label = '%s %.2f %.1f' % (classes[int(cls)], conf, deg)
             plot_one_box(xyxy, img0, label=label, color=colors[int(cls)])
 
-        # img1 = cv2.cvtColor(img0[bb[1]:bb[3], bb[0]:bb[2]],cv2.COLOR_BGR2RGB)
-        # img1 = Image.fromarray(img1)
-        # img1 = transform(img1).unsqueeze(0)
-        # img1 = img1.to(device)
-        # pred = graspnet(img1)
-        # pred = pred.squeeze().cpu().detach().numpy()
-        # res = [float(x) for x in pred]
-        # print(res)
-        # self.ang = 0.0
-        # self.x = v0
-        # self.y = u0
-        # if res[0] > 0.99:
-        #     cos2, sin2 = res[1], res[2]
-        #     cos  = math.log(cos2/(1-cos2))
-        #     sin  = 0.5 * math.log((1+sin2)/(1-sin2))
-        #     fai  = 0.5 * math.atan2(sin, cos)
-        #     ang = fai * 180 / math.pi
-        #     print(ang)
-        #     self.ang = ang
-        #     self.x = center[0]
-        #     self.y = center[1]
-
-
-        
         # cv2.imshow("Current image", img_src)
         cv2.imshow("image0", img0)
         cv2.imshow("Target image", self.img_t)
