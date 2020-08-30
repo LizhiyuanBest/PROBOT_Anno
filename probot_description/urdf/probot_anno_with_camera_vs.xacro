@@ -48,7 +48,7 @@
     <parent link="world" />
     <child link="base_link" />
   </joint>
-
+ 
   <link name="base_link">
     <inertial>
       <origin xyz="-0.010934 0.23134 0.0051509" rpy="0 0 0" />
@@ -320,6 +320,7 @@
 
   <xacro:include filename="$(find probot_description)/urdf/sensors/camera.urdf.xacro"/>
   <xacro:include filename="$(find probot_description)/urdf/sensors/hand_camera_vs.urdf.xacro"/>
+  <!-- <xacro:include filename="$(find probot_description)/urdf/tri_pipe.xacro"/> -->
 
   <!-- ros_control plugin -->
   <gazebo>

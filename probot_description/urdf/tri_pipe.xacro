@@ -1,0 +1,54 @@
+<?xml version="0.0" ?>
+<robot name="Tri_Pipe">
+
+  <!-- <link name="base" static="true"/>
+  <joint name="joint_00" type="fixed">
+    <origin xyz="0.25 0.25 0.025" rpy="0 0 0" />
+    <parent link="base" />
+    <child link="tri_pipe" />
+  </joint> -->
+  <link name="tri_pipe" static="true">
+    <contact>
+      <lateral_friction value="0.01"/>
+      <rolling_friction value="0.01"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="0.0"/>
+    </contact>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0.0 0"/>
+      <mass value=".15"/>
+      <inertia ixx=".001" ixy="0" ixz="0" iyy=".001" iyz="0" izz=".001"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 1.5708 1.5708" xyz="0.0 0.0 0.015"/>
+      <geometry>
+        <mesh filename="package://probot_description/meshes/Tri_Pipe.STL" scale=".001 .001 .001" />
+      </geometry>
+      <material name="">
+        <color rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 1.5708 1.5708" xyz="0 0 0"/>
+      <geometry>
+      <box size="0.035 0.035 0.025"/>
+      </geometry>
+    </collision>
+    <!-- <collision>
+      <origin rpy="0 1.5708 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://probot_description/meshes/Tri_Pipe.STL" scale=".001 .001 .001" />
+      </geometry>
+    </collision> -->
+  </link>
+  <gazebo reference="tri_pipe">
+    <static>true</static>
+    <implicitSpringDamper>1</implicitSpringDamper>
+    <material>Gazebo/White</material>
+    <mu1>100000</mu1>
+    <mu2>100000</mu2>
+    <kp>10000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+</robot>
+
