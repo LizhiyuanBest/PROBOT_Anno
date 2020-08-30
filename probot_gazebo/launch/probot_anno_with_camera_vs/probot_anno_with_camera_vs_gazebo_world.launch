@@ -19,11 +19,14 @@
 
   <!-- Load the URDF into the ROS Parameter Server -->
   <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find probot_description)/urdf/probot_anno_with_camera_vs.xacro'" /> 
+  <param name="tri_pipe" command="$(find xacro)/xacro --inorder '$(find probot_description)/urdf/tri_pipe.xacro'" /> 
 
 
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
 	args="-urdf -model probot_anno -param robot_description"/> 
+  <node name="urdf_spawner2" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+	args="-urdf -model Tri_Pipe -param tri_pipe -x 0.3 -y 0.15 -z 0.02"/>
 
 
 </launch>

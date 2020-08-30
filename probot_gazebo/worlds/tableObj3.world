@@ -155,7 +155,7 @@
       </link>
     </model>
 
-    <!-- <model name='table_lbox_model'>
+    <model name='table_lbox_model'>
       <static>true</static>
       <pose frame=''>0.09 0.250 0.005 0 -0 0</pose>
       <link name='table_lbox_model_link'>
@@ -203,9 +203,9 @@
         <self_collide>0</self_collide>
         <kinematic>0</kinematic>
       </link>
-    </model> -->
+    </model>
 
-    <!-- <model name='table_cylinder_model'>
+    <model name='table_cylinder_model'>
       <static>true</static>
       <pose frame=''> 0.185 0.25 0.005 0 -0 0</pose>
       <link name='table_cylinder_model_link'>
@@ -255,7 +255,7 @@
         <self_collide>0</self_collide>
         <kinematic>0</kinematic>
       </link>
-    </model> -->
+    </model>
 
     <!-- <surface>
       <friction>
@@ -450,7 +450,7 @@
       </link>
     </model>   
 
-    <!-- <model name='lbox_model_r'>
+    <model name='lbox_model_r'>
       <static>false</static>
       <pose frame=''>0.27 0.0 0.10 0 -0 0</pose>
       <link name='lbox_model_r_link'>
@@ -631,9 +631,9 @@
         <self_collide>0</self_collide>
         <kinematic>0</kinematic>
       </link>
-    </model> -->
+    </model>
 
-    <!-- <model name='cylinder_model_r'>
+    <model name='cylinder_model_r'>
       <static>false</static>
       <pose frame=''>0.27 -0.10 0.10 0 -0 0</pose>
       <link name='cylinder_model_r_link'>
@@ -820,7 +820,7 @@
         <self_collide>0</self_collide>
         <kinematic>0</kinematic>
       </link>
-    </model> -->
+    </model>
 
 
   </world>
