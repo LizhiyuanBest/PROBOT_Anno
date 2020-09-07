@@ -21,7 +21,7 @@ if ros_path in sys.path:
     sys.path.remove(ros_path)
 import cv2
 sys.path.append('/opt/ros/kinetic/lib/python2.7/dist-packages')
-sys.path.append('/home/li/visual_servo/yolov3_grasp_multi')
+sys.path.append('/home/li/visual_servo/real_grasp')
 from models import *
 from project.utils import *
 from project.datasets import *
@@ -38,12 +38,14 @@ u0 = 240
 v0 = 320  
 
 Images_PATH = '/home/li/ROS/probot_ws/src/PROBOT_Anno/nn_vs/images/image_200.jpg'
-yolo_path = '/home/li/visual_servo/yolov3_grasp_multi'
+yolo_path = '/home/li/visual_servo/real_grasp'
 cfg = join(yolo_path, 'cfg/yolov3-tiny.cfg')
 data_cfg = join(yolo_path, 'data/objs.data')
-weights = join(yolo_path, 'weights/best_4_Lmax.pt')
+weights = join(yolo_path, 'weights/best.pt')
+target_image = [join(yolo_path, 'data/tri_pipe.jpg'), \
+                join(yolo_path, 'data/str_pipe.jpg'), \
+                join(yolo_path, 'data/cur_pipe.jpg')]
 
-fourcc = 'mp4v'
 img_size = 416
 conf_thres = 0.5
 nms_thres = 0.5
@@ -60,7 +62,7 @@ model.fuse()
 model.to(device).eval()
 
 # Get classes and colors
-classes = ['bolt', 'tri_pipe', 'str_pipe', 'cur_pipe']
+classes = ['tri_pipe', 'str_pipe', 'cur_pipe']
 colors = [[random.randint(0, 255) for _ in range(3)] for _ in range(len(classes))]
 
 
@@ -77,7 +79,7 @@ class Image_Processor:
         # 初始化ROS节点
         rospy.init_node('Image_Processor', anonymous=True)
 
-        self.img_t = cv2.imread(Images_PATH)
+        self.img_t = cv2.imread(target_image[0])
         self.img_c = None
         self.ang = 0.0
         self.x = v0
@@ -116,20 +118,23 @@ class Image_Processor:
             # det[:, 5] = 0.5 * math.log((1 + det[:, 5]) / (1 - det[:, 5]))
             det[:, 4] = 0.5 * torch.atan2(det[:, 5], det[:, 4])
             det[:, 5] = det[:, 4] * 180 / math.pi
-            *xyxy, ang, deg, conf, cls_conf, cls = det[0]
-            c1, c2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))
-            print(c1,c2)
-            center = [(c1[0]+c2[0])//2, (c1[1]+c2[1])//2]
-            # bb = [center[0]-L2, center[1]-L2, center[0]+L2, center[1]+L2]
-            self.ang = deg
-            self.x = center[0]
-            self.y = center[1]
-            # print(center[0], center[1], deg)
+
             # Draw bounding boxes and labels of detections
             for *xyxy, ang, deg, conf, cls_conf, cls in det:
                 # Add bbox to the image
                 label = '%s %.2f %.1f' % (classes[int(cls)], conf, deg)
                 plot_one_box(xyxy, img0, label=label, color=colors[int(cls)])
+
+                if cls == 0:
+                    # *xyxy, ang, deg, conf, cls_conf, cls = det[0]
+                    c1, c2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))
+                    # print(c1,c2)
+                    center = [(c1[0]+c2[0])//2, (c1[1]+c2[1])//2]
+                    # bb = [center[0]-L2, center[1]-L2, center[0]+L2, center[1]+L2]
+                    self.ang = deg
+                    self.x = center[0]
+                    self.y = center[1]
+                    # print(center[0], center[1], deg)
 
         # cv2.imshow("Current image", img_src)
         cv2.imshow("image0", img0)
